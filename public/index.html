@@ -1,1 +1,120 @@
-Hello world!
+<html>
+
+<head>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans&display=swap" rel="stylesheet">
+    <script src="serve.js">
+    </script>
+    <style>
+        * {
+            font-family: 'Fira Sans', sans-serif;
+        }
+
+        div[data-divshow] {
+            display: none;
+            border: 1px solid green;
+        }
+
+        body>div {
+            margin: 0 20%;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            display:none;
+        }
+    </style>
+</head>
+
+<body style="background-image:url('very-nice-lake.jpg');background-size: cover;">
+    <div class="landing" style="display:block">
+        <h1>Cardno Sustain: Making a Difference for the Future</h1>
+        <h2>Enter a project ID to get started...</h1>
+            <input style="font-size: 1em" placeholder="Project ID...">
+            <button>Go!</button>
+    </div>
+    <div class="loading">
+        <h1>Loading your project...</h1>
+    </div>
+    <div class="main_body_div" style="display:none">
+        <h1>Cardno Sustain: <span data-field="Name" contenteditable="true">Project Name...</span></h1>
+        <h2>Project type: <span data-field="Type" contenteditable="true">Infrastructure</span> -- Timeframe:<span data-field="startDate"
+                contenteditable="true">Start date</span>-><span contenteditable="true" data-field="endDate">End date</span></h2>
+        <h1>Current sustainabilty score: <span>50/100</span></h1>
+        <p>Estimated Green Star rating:<img src="sixstar.png" style="max-height:1em"></p>
+        <div>
+            <h2>Areas of sustainability</h2>
+            <div class="sustArea" data-divshow='Ecological'>
+                <h3>Ecological sustainability</h3>
+                <div>
+                    <h4>Factors</h4>
+                    <div class="ecoCriteria" data-divshow="Fish">
+                        <p>Availability of fish: <select>
+                                <option>High</option>
+                                <option>Medium</option>
+                                <option>Low</option>
+                            </select></p>
+                    </div>
+                    <h3>Add an ecological criteria:</h3>
+                    <select data-divshow="ecoCriteria">
+                        <option value="Fish">Fish</option>
+                    </select>
+                    <button data-divshow="ecoCriteria">Add</button>
+                </div>
+            </div>
+            <div class="sustArea" data-divshow='Energy'>
+                <h3>Energy sustainability</h3>
+                <div>
+                    <h4>Factors</h4>
+
+                </div>
+            </div>
+            <div class="sustArea" data-divshow='Water'>
+                <h3>Ecological sustainability</h3>
+                <div>
+                    <h4>Factors</h4>
+                    <p>Availability of fish: <select>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select></p>
+                </div>
+            </div>
+            <div class="sustArea" data-divshow='Waste'>
+                <h3>Ecological sustainability</h3>
+                <div>
+                    <h4>Factors</h4>
+                    <p>Availability of fish: <select>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select></p>
+                </div>
+            </div>
+            <div class="sustArea" data-divshow='Transportation'>
+                <h3>Ecological sustainability</h3>
+                <div>
+                    <h4>Factors</h4>
+                    <p>Availability of fish: <select>
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select></p>
+                </div>
+            </div>
+            <div class="sustainability_areas_add">
+                <h3>Add a sustainability area:</h3>
+                <select data-divshow="sustArea">
+                    <option value="Ecological">Ecological</option>
+                    <option value="Energy">Energy</option>
+                    <option value="Water">Water</option>
+                    <option value="Waste">Waste</option>
+                    <option value="Transportation">Transportation</option>
+                </select>
+                <button data-divshow="sustArea">Add</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
