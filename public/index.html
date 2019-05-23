@@ -11,193 +11,107 @@
     </script>
     <script src="export.js">
     </script>
-    <style>
-        * {
-            font-family: 'Fira Sans', sans-serif;
-        }
-
-        div[data-divshow] {
-            display: none;
-            border: 1px solid green;
-        }
-
-        body>div {
-            margin: 0 20%;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 10px;
-            display: none;
-        }
-
-        .tabbar {
-            display: flex;
-            margin-top: 1em;
-        }
-
-        .tabbar>p {
-            display: block;
-            border: 1px solid;
-            padding: 3px;
-            margin: 0;
-        }
-
-        .maingroup {
-            background: rgba(255, 255, 255, 0.4);
-            padding: 1em;
-        }
-
-        [data-tabname] {
-            display: none;
-        }
-
-        .dashboardCategories {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
-
-        .dashboardCategories>div {
-            flex: 0 0 calc(50% - 2em);
-            background: rgba(0, 105, 0, 0.4);
-            padding: 0.5em;
-            margin: 0.5em;
-        }
-
-        .projectComponents {
-            display: flex;
-            margin: 3px;
-            flex-wrap: wrap;
-        }
-
-        .projectComponents>p {
-            display: block;
-            position: relative;
-            text-align: center;
-            padding: 6px;
-            margin: 0px;
-            margin-top: 10px;
-            margin-left: 10px;
-        }
-
-        .projectComponents>p:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 50%;
-            width: 100%;
-            background: #5CAD85;
-            transform: skew(20deg, 0deg);
-            z-index: -1;
-        }
-
-        .projectComponents>p:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: 0;
-            height: 51%;
-            width: 100%;
-            background: #5CAD85;
-            transform: skew(-20deg, 0deg);
-            z-index: -1;
-        }
-
-        .projectComponents>p[data-special]:after,
-        .projectComponents>p[data-special]:before {
-            background: green;
-        }
-
-        .projectComponents>p.selected:after,
-        .projectComponents>p.selected:before {
-            background-image: repeating-linear-gradient(0.25turn, #006B73, #006B73 45%, lightgreen 55%, #006B73 65%, #006B73);
-            background-size: 200% 100%;
-            animation: select_highlight 6s linear infinite;
-        }
-
-        @keyframes select_highlight {
-            0% {
-                background-position: 130% 0;
-            }
-
-            100% {
-                background-position: 0% 0;
-            }
-        }
-
-        .descriptionquery {
-            position: relative;
-            color: blue;
-            text-decoration: underline;
-        }
-
-        .descriptionquery>div {
-            color: black;
-            text-decoration: none;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            display: none;
-            position: absolute;
-            transform: translatex(-50%);
-            left: 50%;
-            top: 130%;
-            width: 300px;
-        }
-
-        .descriptionquery:hover>div::before {
-            content: "";
-            width: 0px;
-            height: 0px;
-            border: 0.8em solid transparent;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: -20px;
-            border-bottom: 10px solid white;
-        }
-
-        .descriptionquery:hover>div {
-            display: block;
-        }
-
-        .print_body {
-            display: none;
-        }
-
-        @media print {
-            .print_body {
-                display: block;
-            }
-
-            .unprint_body {
-                display: none;
-            }
-
-            body>div {
-                margin: 0;
-                background: none;
-                padding: 10px;
-            }
-        }
-    </style>
+    <script src="present.js">
+    </script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 
 <body style="background-image:url('very-nice-lake.jpg');background-size: cover;">
-    <div class="landing" style="display:block">
-        <h1>Cardno Sustain: Making a Difference for the Future</h1>
-        <h2>Enter a project ID to get started...</h1>
-            <input style="font-size: 1em" placeholder="Project ID...">
-            <button>Go!</button>
+    <div class="landing" style="display:block; width:100%; margin:0; padding:0">
+        <div class="navbar">
+            <a style="font-size: 1.5em; padding: calc(14px - 0.25em) 16px;">Cardno Sustain</a>
+            <a data-slide="slideone">Get started</a>
+            <a data-slide="slide2">Making a difference</a>
+            <a data-slide="slide3">Sustainable futures</a>
+            <a data-slide="integ">Integration</a>
+        </div>
+        <div data-slide="slideone" style="padding:0 10vw">
+            <div style="display:flex; flex-direction:row">
+                <img src="laptop.png" style="height: 40vh"></img>
+                <div style="display:flex; justify-content: center; flex-direction:column">
+                    <h1 style="font-size:3em">Cardno Sustain: Making a Difference for the Future</h1>
+                    <h2>Enter a project ID to get started...</h1>
+                        <div>
+                            <input style="font-size: 1em" placeholder="Project ID...">
+                            <button>Go!</button>
+                        </div>
+                </div>
+            </div>
+        </div>
+        <div data-slide="slide2" style="padding:0 10vw">
+            <div style="display:flex; flex-direction:column">
+                <h1 style="font-size:3em">How do we make a difference?</h1>
+                <h1 style="font-size:2em">By making sure that Cardno’s clients are aware of how <em>each and every
+                        decision affects sustainability</em> and how <em>sustainability makes a positive
+                        difference.</em> </h1>
+            </div>
+        </div>
+        <div data-slide="slide3" style="padding:0 10vw">
+            <div style="display:flex; flex-direction:row">
+                <div style="text-align: right">
+                    <p>Energy</p>
+                    <p>Water</p>
+                    <p>Waste</p>
+                </div>
+                <div style="flex: 1 0 50%;">
+                    <div style="padding: 0 5em;">
+                        <h1 style="font-size:3em">Sustainability factors combine to create enduring physical, social,
+                            economic and cultural environments.</h1>
+                    </div>
+
+                </div>
+                <div>
+                    <p>Transport</p>
+                    <p>Ecology</p>
+                    <p>Economy</p>
+                </div>
+            </div>
+        </div>
+        <div data-slide="integ" style="padding:0 10vw">
+            <div style="display:flex; flex-direction:column">
+                <h1 style="font-size:3em">We'll leverage and facilitate Cardno's existing processes.</h1>
+                <img src="integn.png" style="object-fit:contain"></img>
+            </div>
+        </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="loading">
         <h1>Loading your project...</h1>
     </div>
     <div class="main_body_div" style="display:none">
         <h1>Cardno Sustain: <span data-metafield="Name" contenteditable="true">Project Name...</span></h1>
-        <h2>Project type: <span data-metafield="Type" contenteditable="true">Infrastructure</span> -- Timeframe: <span
-                data-metafield="startDate" contenteditable="true">Start date</span>-><span contenteditable="true"
+        <h2>Project type: <span data-metafield="Type" contenteditable="true">Infrastructure</span> -- Timeframe:
+            <span data-metafield="startDate" contenteditable="true">Start date</span>-><span contenteditable="true"
                 data-metafield="endDate">End date</span></h2>
-        <p>Change image:<input class="bgim" type="file"><span style="display:none" class="ulcp">Upload complete!</span> -- <button class="xport">Export as file</button> -- <label>Input from file:<input class="impt" type="file"></label></p>
+        <p>Change image:<input class="bgim" type="file"><span style="display:none" class="ulcp">Upload
+                complete!</span>
+            -- <button class="xport">Export as file</button> -- <label>Input from file:<input class="impt"
+                    type="file"></label></p>
         <h1>Current sustainabilty score: <span data-metafield="Score">50</span>/100</h1>
         <p>Estimated Green Star rating:<img class="gstar" src="sixstar.png" style="height: 1em;width: 20px;
             object-fit: cover;
@@ -206,7 +120,8 @@
             <div>
                 <h1 style="margin: 0"> Project Components</h1>
                 <div class="projectComponents">
-                    <p data-component='baseline' class="selected" data-special='baseline'><span>Baseline</span></span>
+                    <p data-component='baseline' class="selected" data-special='baseline'>
+                        <span>Baseline</span></span>
                     </p>
                     <p data-component='Add' data-special='add'><span>+</span></p>
                     <p data-component='fresult' data-special='final'><span>Final result</span></p>
