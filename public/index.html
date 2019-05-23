@@ -3,10 +3,13 @@
 <head>
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-storage.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans&display=swap" rel="stylesheet">
     <script src="serve.js">
     </script>
     <script src="criteria.js">
+    </script>
+    <script src="export.js">
     </script>
     <style>
         * {
@@ -42,6 +45,10 @@
             padding: 1em;
         }
 
+        [data-tabname] {
+            display: none;
+        }
+
         .dashboardCategories {
             display: flex;
             flex-wrap: wrap;
@@ -58,6 +65,7 @@
         .projectComponents {
             display: flex;
             margin: 3px;
+            flex-wrap: wrap;
         }
 
         .projectComponents>p {
@@ -65,7 +73,8 @@
             position: relative;
             text-align: center;
             padding: 6px;
-            margin: 0;
+            margin: 0px;
+            margin-top: 10px;
             margin-left: 10px;
         }
 
@@ -114,6 +123,62 @@
                 background-position: 0% 0;
             }
         }
+
+        .descriptionquery {
+            position: relative;
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .descriptionquery>div {
+            color: black;
+            text-decoration: none;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
+            position: absolute;
+            transform: translatex(-50%);
+            left: 50%;
+            top: 130%;
+            width: 300px;
+        }
+
+        .descriptionquery:hover>div::before {
+            content: "";
+            width: 0px;
+            height: 0px;
+            border: 0.8em solid transparent;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -20px;
+            border-bottom: 10px solid white;
+        }
+
+        .descriptionquery:hover>div {
+            display: block;
+        }
+
+        .print_body {
+            display: none;
+        }
+
+        @media print {
+            .print_body {
+                display: block;
+            }
+
+            .unprint_body {
+                display: none;
+            }
+
+            body>div {
+                margin: 0;
+                background: none;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 
@@ -132,17 +197,19 @@
         <h2>Project type: <span data-metafield="Type" contenteditable="true">Infrastructure</span> -- Timeframe: <span
                 data-metafield="startDate" contenteditable="true">Start date</span>-><span contenteditable="true"
                 data-metafield="endDate">End date</span></h2>
-        <h1>Current sustainabilty score: <span>50/100</span></h1>
-        <p>Estimated Green Star rating:<img src="sixstar.png" style="height: 1em;width: 20px;
+        <p>Change image:<input class="bgim" type="file"><span style="display:none" class="ulcp">Upload complete!</span> -- <button class="xport">Export as file</button> -- <label>Input from file:<input class="impt" type="file"></label></p>
+        <h1>Current sustainabilty score: <span data-metafield="Score">50</span>/100</h1>
+        <p>Estimated Green Star rating:<img class="gstar" src="sixstar.png" style="height: 1em;width: 20px;
             object-fit: cover;
             object-position: left;"></p>
-        <div>
+        <div class="unprint_body">
             <div>
                 <h1 style="margin: 0"> Project Components</h1>
                 <div class="projectComponents">
-                    <p data-component='baseline' class="selected" data-special='baseline'>Baseline</p>
-                    <p data-component='Add' data-special='add'>+</p>
-                    <p data-component='fresult' data-special='final'>Final result</p>
+                    <p data-component='baseline' class="selected" data-special='baseline'><span>Baseline</span></span>
+                    </p>
+                    <p data-component='Add' data-special='add'><span>+</span></p>
+                    <p data-component='fresult' data-special='final'><span>Final result</span></p>
                 </div>
             </div>
             <div class="tabbar">
@@ -153,76 +220,22 @@
                 <div class="dashboardCategories">
                     <div data-category="Ecological">
                         <h1>Ecological sustainability</h1>
-                        <p>10/15 recommendations adopted</p>
-                    </div>
-                    <div data-category="Energy">
-                        <h1>Energy sustainability</h1>
-                        <p>100 kWh saved per annum (compared to baseline)</p>
-                        <p>Cost savings: $400/mo (compared to baseline)</p>
-                    </div>
-                    <div data-category="Water">
-                        <h1>Water sustainability</h1>
-                        <p>100 L saved per annum (compared to baseline)</p>
-                        <p>Cost savings: $300/mo (compared to baseline)</p>
+                        <p>Score: <span class="Ecoscore"></span></p>
                     </div>
                 </div>
             </div>
-            <div class="maingroup" data-tabname="detailtab" style="display:none">
-                <h2>Areas of sustainability</h2>
-                <div class="sustArea" data-divshow='Energy'>
-                    <h3>Energy sustainability</h3>
-                    <div>
-                        <h4>Factors</h4>
-
-                    </div>
-                </div>
-                <div class="sustArea" data-divshow='Water'>
-                    <h3>Ecological sustainability</h3>
-                    <div>
-                        <h4>Factors</h4>
-                        <p>Availability of fish: <select>
-                                <option>High</option>
-                                <option>Medium</option>
-                                <option>Low</option>
-                            </select></p>
-                    </div>
-                </div>
-                <div class="sustArea" data-divshow='Waste'>
-                    <h3>Ecological sustainability</h3>
-                    <div>
-                        <h4>Factors</h4>
-                        <p>Availability of fish: <select>
-                                <option>High</option>
-                                <option>Medium</option>
-                                <option>Low</option>
-                            </select></p>
-                    </div>
-                </div>
-                <div class="sustArea" data-divshow='Transportation'>
-                    <h3>Ecological sustainability</h3>
-                    <div>
-                        <h4>Factors</h4>
-                        <p>Availability of fish: <select>
-                                <option>High</option>
-                                <option>Medium</option>
-                                <option>Low</option>
-                            </select></p>
-                    </div>
-                </div>
+            <div class="maingroup" data-tabname="detailtab">
                 <div class="sustainability_areas_add">
                     <h3>Add a sustainability area:</h3>
                     <select data-divshow="sustArea">
-                        <option value="Energy">Energy</option>
-                        <option value="Water">Water</option>
-                        <option value="Waste">Waste</option>
-                        <option value="Transportation">Transportation</option>
                     </select>
                     <button data-divshow="sustArea">Add</button>
                 </div>
             </div>
         </div>
     </div>
-
+    <img class="print_body" src="very-nice-lake.jpg"></img>
+    <div class="print_body"></div>
 </body>
 
 </html>

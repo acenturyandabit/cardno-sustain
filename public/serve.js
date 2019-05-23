@@ -7,6 +7,7 @@ firebase.initializeApp({
     messagingSenderId: "355342936960"
 });
 var db = firebase.firestore();
+var storageRef = firebase.storage().ref();
 db.settings({
     timestampsInSnapshots: true
 });
@@ -22,7 +23,14 @@ function saveOnNavigate() {
     }
 
     let obj = {};
-    let displayName = document.querySelector(`[data-component="${basedata.selectedComponent}"]`).innerText;
+    let displayName = document.querySelector(`[data-component="${basedata.selectedComponent}"]>span`).innerText;
+    //changing active status when in different sections
+    let actives = document.querySelectorAll(`[data-component]>input`);
+    for (let i = 0; i < actives.length; i++) {
+        for (let j = 0; j < basedata.components.length; j++) {
+            if (basedata.components[j].id == actives[i].parentElement.dataset.component) basedata.components[j].active = actives[i].checked;
+        }
+    }
     for (let i = 0; i < fields.length; i++) {
         if (fields[i].matches("[data-activated='true']")) {
             obj[fields[i].dataset.field] = fields[i].value || fields[i].innerText;
@@ -39,7 +47,25 @@ function saveOnNavigate() {
 function saveNow() {
     saveOnNavigate();
     //Save to firebase.
-    db.collection("cardno").doc(usp.get("docName")).set(basedata);
+    if (usp.has("docName")) {
+        if (document.querySelector(".bgim").files.length) {
+            // Create a reference to 'the image id'
+            let name = "cardno_"+usp.get("docName");
+            let bits = document.querySelector(".bgim").files[0].name.split(".");
+            name += bits[bits.length - 1];
+            let cimref = storageRef.child(name);
+            cimref.put(document.querySelector(".bgim").files[0]).then((ref) => {
+                cimref.getDownloadURL().then((url) => {
+                    db.collection("cardno").doc(usp.get("docName")).update({
+                        image: url
+                    });
+                    document.querySelector(".ulcp").style.display="inline-block";
+                    setTimeout(()=>{document.querySelector(".ulcp").style.display="none";},2000);
+                });
+            });
+        }
+        db.collection("cardno").doc(usp.get("docName")).update(basedata);
+    }
 
 }
 
@@ -85,14 +111,18 @@ function loadNow(data) {
     for (let i = 0; i < basedata.components.length; i++) {
         if (!isNaN(Number(basedata.components[i].id))) {
             let nc = document.createElement("p");
-            nc.innerText = basedata.components[i].displayName;
+            nc.innerHTML = `<input type="checkbox"><span>${basedata.components[i].displayName}</span>`;
+            if (basedata.components[i].active) nc.children[0].checked = true;
             nc.dataset.component = basedata.components[i].id;
-            nc.contentEditable = true;
+            nc.children[1].contentEditable = true;
             aa.parentElement.insertBefore(nc, aa);
         }
     }
     //load selected component
     renderComponent(basedata.selectedComponent);
+    calculateWeightings();
+    renderDashboard();
+    if (basedata.image)document.body.style.backgroundImage=`url(${basedata.image})`;
 }
 
 function renderComponent(index) {
@@ -117,8 +147,10 @@ function renderComponent(index) {
     for (let i = 0; i < acts.length; i++) {
         acts[i].dataset.activated = false;
     }
-    // Clean up - hide all sustaarea and criteria
+    // Clean up - hide all sustarea and criteria; show all options
     let all = document.querySelectorAll(".sustArea, .criteria");
+    let q = document.querySelectorAll("select[data-divshow] option");
+    for (let i = 0; i < q.length; i++) q[i].style.display = "block";
     for (let i = 0; i < all.length; i++) all[i].style.display = "none";
     for (let i in data) {
         showOption(i, data[i]);
@@ -134,6 +166,10 @@ function showOption(i, value) {
         let _field = field;
         while (_field != document.body) {
             if (_field.classList.contains("criteria") || _field.classList.contains("sustArea")) _field.style.display = "block";
+            if (_field.dataset.divshow) {
+                let btn = document.querySelector(`option[value='${_field.dataset.divshow}']`);
+                if (btn) btn.style.display = "none";
+            }
             _field = _field.parentElement;
         }
     } catch (e) {
@@ -157,7 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!usp.has("dbg")) {
             db.collection("cardno").doc(usp.get('docName')).get().then((d) => {
                 document.body.querySelector(".loading").style.display = "none";
-                loadNow(d.data());
+                let xd = d.data();
+                if (!xd) {
+                    xd = basedata;
+                }
+                loadNow(xd);
                 document.body.querySelector(".main_body_div").style.display = "block";
             })
         } else {
@@ -169,7 +209,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target.matches("button[data-divshow]")) {
                 let v = document.querySelector(`select[data-divshow='${e.target.dataset.divshow}']`).value;
                 document.querySelector(`.${e.target.dataset.divshow}[data-divshow='${v}']`).style.display = "block";
-                document.querySelector(`.${e.target.dataset.divshow}[data-divshow='${v}']`).dataset.activated = true;
+                let fld = document.querySelector(`[data-field='${v}']`);
+                if (fld) fld.dataset.activated = true;
                 document.querySelector(`select[data-divshow='${e.target.dataset.divshow}'] option[value='${v}']`).style.display = "none";
                 document.querySelector(`select[data-divshow='${e.target.dataset.divshow}']`).value = "Select...";
             }
@@ -188,14 +229,16 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         //project components
         document.body.addEventListener("click", (e) => {
-            if (e.target.matches(".projectComponents>p")) {
+            if (e.target.matches(".projectComponents>p>span,.projectComponents>p")) {
                 saveOnNavigate();
                 //show relevant tab
-                let cid = e.target.dataset.component;
-                if (e.target.dataset.special == 'add') {
+                etgt = e.target;
+                if (etgt.tagName != "SPAN") etgt = etgt.children[etgt.children.length - 1];
+                let cid = etgt.parentElement.dataset.component;
+                if (etgt.parentElement.dataset.special == 'add') {
                     //create a new component before it
                     let nc = document.createElement("p");
-                    nc.innerText = "New component";
+                    nc.innerHTML = `<input type="checkbox" checked><span>New Component</span>`;
                     nc.dataset.component = guid();
                     basedata.components.splice(basedata.components.length - 1, 0, {
                         id: nc.dataset.component,
@@ -203,12 +246,26 @@ document.addEventListener("DOMContentLoaded", () => {
                         data: {}
                     });
                     cid = nc.dataset.component;
-                    nc.contentEditable = true;
-                    e.target.parentElement.insertBefore(nc, e.target);
+                    nc.children[1].contentEditable = true;
+                    etgt.parentElement.parentElement.insertBefore(nc, etgt.parentElement);
                 }
                 renderComponent(cid);
             }
         })
+
+        document.body.querySelector(".bgim").addEventListener("change", function (e) {
+            let input = e.target;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.body.style.backgroundImage = `url(${e.target.result})`;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        })
+
+
     } else {
         //add event handler for the Go button
         document.body.querySelector(".landing button").addEventListener("click", () => {
