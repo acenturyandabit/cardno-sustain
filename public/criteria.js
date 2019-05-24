@@ -1,22 +1,36 @@
 var criteria = {
-    fishCount: {
-        area: "Ecological",
-        type: "options",
-        prompt: "Availability of fish",
-        scores: {
-            "High": 10,
-            "Medium": 5,
-            "Low": 0
-        },
-        weighting: 10,
-        description: "Number of fish available in the region. Over 200 fish is High."
-    },
-    fishSize: {
-        area: "Ecological",
+    floorspace: {
+        area: "Energy",
         type: "number",
-        prompt: "Size of fish (cm)",
-        weighting: 0.5
+        prompt: "Floor space (m^2)",
+        weighting: function (floorspace) {
+            return 100-stat("euse")/floorspace*0.1;
+        }
+    },
+    occrate: {
+        area: "Energy",
+        type: "number",
+        prompt: "Hours building is occupied per week",
+        weighting: -0.7775,
+        description: "An occupied building is over 20% full."
+    },
+    ncomp: {
+        area: "Energy",
+        type: "number",
+        prompt: "No. computers constantly on",
+        weighting: -0.4
+    },
+    euse: {
+        area: "Energy",
+        type: "number",
+        prompt: "Yearly energy use (kWh):",
+        weighting: -0.1
     }
+}
+
+var cpm;
+function stat(st){
+    return (cpm[st])|| 0;
 }
 
 function generateHTML() {
@@ -94,12 +108,19 @@ function generateHTML() {
 
 function criteriamap(ct, dt) {
     let criterium = criteria[ct];
+    let val;
     switch (criterium.type) {
         case "options":
-            return criterium.scores[dt] * criterium.weighting;
+            val = criterium.scores[dt];
+            break;
         case "number":
-            return dt * weighting;
+            val = dt;
+            break;
+
     }
+    let w = criterium.weighting;
+    if (typeof w =="function")return w(val);
+    else return val*w;
 }
 
 function calculateWeightings() {
@@ -107,6 +128,7 @@ function calculateWeightings() {
     for (let component = 0; component < basedata.components.length - 1; component++) {
         let cmpnt = basedata.components[component];
         cmpnt.calculated = {};
+        cpm=cmpnt.data;
         for (let dt in cmpnt.data) {
             try {
                 if (!cmpnt.calculated[criteria[dt].area]) cmpnt.calculated[criteria[dt].area] = 0;
@@ -122,7 +144,7 @@ function calculateWeightings() {
     finalcmpnt.calculated = {};
     for (let component = 0; component < basedata.components.length - 1; component++) {
         let cmpnt = basedata.components[component];
-        if (cmpnt.active)
+        if (cmpnt.active || component==0)//baseline
             for (let dt in cmpnt.calculated) {
                 if (!finalcmpnt.calculated[dt]) finalcmpnt.calculated[dt] = 0;
                 finalcmpnt.calculated[dt] += cmpnt.calculated[dt];
@@ -143,7 +165,7 @@ function renderDashboard() {
         for (let i in finalcmpnt.calculated) {
             finalscore += finalcmpnt.calculated[i];
         }
-        document.querySelector("[data-metafield='Score']").innerText = finalscore;
+        document.querySelector("[data-metafield='Score']").innerText = Math.round(finalscore);
         //green star rating
         if (finalscore > 100) finalscore = 100;
         document.querySelector(".gstar").style.width = finalscore + "px";
