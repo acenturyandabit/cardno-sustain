@@ -34,6 +34,20 @@ body>div {
 [data-tabname] {
     display: none;
 }
+.tabbar>*[data-tabname]{
+    display:block;
+    background-color:#5CAD85;
+}
+
+.tabbar>h1[data-tabname]{
+    padding: 0 0.5em;
+    
+}
+
+.tabbar>[data-tabname].selected{
+    background-color:green;
+    color:white;
+}
 
 .dashboardCategories {
     display: flex;

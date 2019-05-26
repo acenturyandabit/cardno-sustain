@@ -1,0 +1,39 @@
+<html>
+
+<head>
+    <script>
+        const sendFile = file => {
+            const uri = '/upload'
+            const xhr = new XMLHttpRequest()
+            const fd = new FormData()
+
+            xhr.open('POST', uri, true)
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    const imageName = xhr.responseText
+                    //do what you want with the image name returned
+                    //e.g update the interface
+                }
+            }
+            fd.append('myFile', file);
+            fd.append('reportType', );
+            xhr.send(fd)
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelector("input[type='file']").addEventListener("input", (e) => {
+                if (e.target.files.length) {
+                    sendFile(e.target.files[0]);
+                }
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <label>Upload a file...<input type="file"></label>
+    <div>
+
+    </div>
+</body>
+
+</html>

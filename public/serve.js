@@ -217,14 +217,20 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         //tabbar
         document.body.addEventListener("click", (e) => {
-            if (e.target.matches(".tabbar>p")) {
+            if (e.target.matches(".tabbar>*")) {
                 //hide all other tabs
-                let tbs = document.querySelectorAll(`.${e.target.dataset.group}`);
+                let tbs =e.target.parentElement.querySelectorAll(`[data-tabname]`);
+                for (let i = 0; i < tbs.length; i++) {
+                    tbs[i].classList.remove("selected");
+                }
+                tbs = document.querySelectorAll(`.${e.target.dataset.group}`);
                 for (let i = 0; i < tbs.length; i++) {
                     tbs[i].style.display = "none";
                 }
                 //show relevant tab
                 document.querySelector(`.${e.target.dataset.group}[data-tabname="${e.target.dataset.tabname}"]`).style.display = "block";
+                //add selected class
+                e.target.classList.add("selected");
             }
         })
         //project components

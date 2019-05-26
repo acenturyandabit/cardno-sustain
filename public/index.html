@@ -13,6 +13,8 @@
     </script>
     <script src="present.js">
     </script>
+    <script src="render.js">
+    </script>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Cardno Sustain</title>
 </head>
@@ -59,7 +61,6 @@
                         <h1 style="font-size:3em">Sustainability factors combine to create enduring physical, social,
                             economic and cultural environments.</h1>
                     </div>
-
                 </div>
                 <div>
                     <p>Transport</p>
@@ -75,27 +76,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -118,34 +98,73 @@
             object-fit: cover;
             object-position: left;"></p>
         <div class="unprint_body">
-            <div>
-                <h1 style="margin: 0"> Project Components</h1>
-                <div class="projectComponents">
-                    <p data-component='baseline' class="selected" data-special='baseline'>
-                        <span>Baseline</span></span>
-                    </p>
-                    <p data-component='Add' data-special='add'><span>+</span></p>
-                    <p data-component='fresult' data-special='final'><span>Final result</span></p>
-                </div>
-            </div>
             <div class="tabbar">
-                <p data-group="maingroup" data-tabname="dashtab">Dashboard</p>
-                <p data-group="maingroup" data-tabname="detailtab">Details</p>
+                <h1 data-group="hypergroup" data-tabname="overview" class="selected">Overview</h1>
+                <h1 data-group="hypergroup" data-tabname="components">Project Components</h1>
+                <h1 data-group="hypergroup" data-tabname="xreporting">External Reporting</h1>
             </div>
-            <div class="maingroup" data-tabname="dashtab" style="display:block; padding: 0">
-                <div class="dashboardCategories">
-                    <div data-category="Ecological">
-                        <h1>Ecological sustainability</h1>
-                        <p>Score: <span class="Ecoscore"></span></p>
+            <div class="hypergroup" data-tabname="overview" style="display:block; padding: 0">
+                <canvas class="ringer" style="min-height:500px"></canvas>
+            </div>
+            <div class="hypergroup" data-tabname="components">
+                <div>
+                    <div class="projectComponents">
+                        <p data-component='baseline' class="selected" data-special='baseline'>
+                            <span>Baseline</span></span>
+                        </p>
+                        <p data-component='Add' data-special='add'><span>+</span></p>
+                        <p data-component='fresult' data-special='final'><span>Final result</span></p>
+                    </div>
+                </div>
+                <div class="tabbar">
+                    <p data-group="maingroup" data-tabname="dashtab" class="selected">Dashboard</p>
+                    <p data-group="maingroup" data-tabname="detailtab">Details</p>
+                </div>
+                <div class="maingroup" data-tabname="dashtab" style="display:block; padding: 0">
+                    <div class="dashboardCategories">
+                        <div data-category="Ecological">
+                            <h1>Ecological sustainability</h1>
+                            <p>Score: <span class="Ecoscore"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="maingroup" data-tabname="detailtab">
+                    <div class="sustainability_areas_add">
+                        <h3>Add a sustainability area:</h3>
+                        <select data-divshow="sustArea">
+                        </select>
+                        <button data-divshow="sustArea">Add</button>
                     </div>
                 </div>
             </div>
-            <div class="maingroup" data-tabname="detailtab">
-                <div class="sustainability_areas_add">
-                    <h3>Add a sustainability area:</h3>
-                    <select data-divshow="sustArea">
-                    </select>
-                    <button data-divshow="sustArea">Add</button>
+            <div class="hypergroup" data-tabname="xreporting">
+                <div class="tabbar">
+                    <p data-group="reportgroup" data-tabname="gstar" class="selected">GreenStar</p>
+                    <p data-group="reportgroup" data-tabname="nabers">NABERS</p>
+                    <p data-group="reportgroup" data-tabname="bess">BESS</p>
+                </div>
+                <div class="reportgroup" data-tabname="gstar" style="display:block; padding: 0">
+                    <h2>Upload report...</h2>
+                    <input type="file">
+                    <button>Go</button>
+                    <div>
+                    </div>
+                </div>
+                <div class="reportgroup" data-tabname="nabers">
+                    <h2>Upload report...</h2>
+                    <input type="file">
+                    <button>Go</button>
+                    <div>
+
+                    </div>
+                </div>
+                <div class="reportgroup" data-tabname="bess">
+                    <h2>Upload report...</h2>
+                    <input type="file">
+                    <button>Go</button>
+                    <div>
+
+                    </div>
                 </div>
             </div>
         </div>
