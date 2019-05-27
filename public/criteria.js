@@ -14,7 +14,7 @@ var criteria = {
         type: "number",
         displayPriority: 1,
         prompt: "Floor space (m^2)",
-        weighting:0
+        weighting: 0
     },
     occrate: {
         area: "Summary",
@@ -34,7 +34,7 @@ var criteria = {
         type: "number",
         prompt: "12 Month Energy use (kWh)",
         weighting: function (euse) {
-            return 100 - euse / (stat('floorspace')*stat('occrate'));
+            return 100 - euse / (stat('floorspace') * stat('occrate'));
         }
     },
     gpower: {
@@ -48,7 +48,9 @@ var criteria = {
         area: "Energy",
         type: "number",
         prompt: "Yearly Natural gas use (MJ):",
-        weighting: 100 - euse / (stat('floorspace')*stat('occrate'));
+        weighting: () => {
+            return 100 - euse / (stat('floorspace') * stat('occrate'));
+        }
     },
     dsll: {
         area: "Energy",
@@ -150,18 +152,18 @@ function updateFrontBoard() {
     dd = dd.slice(0, 5);
     let ihtml = ``;
     for (let i = 0; i < dd.length; i++) {
-        let rcol=Math.abs((basedata.target[dd[i].ct]-ld[dd[i].ct])/basedata.target[dd[i].ct]);
-        if (rcol>1)rcol=1;
-        rcol=1-rcol;
+        let rcol = Math.abs((basedata.target[dd[i].ct] - ld[dd[i].ct]) / basedata.target[dd[i].ct]);
+        if (rcol > 1) rcol = 1;
+        rcol = 1 - rcol;
         let h = rcol * 120;
         ihtml += `<p style="background: hsl(${h},100%,50%)">${criteria[dd[i].ct].prompt}: ${ld[dd[i].ct]}</p>`;
     }
     document.querySelector(".cnt_stat").innerHTML = ihtml;
-    let tgttt=document.querySelector(".tgt_stat");
-    tgttt.innerHTML="";
+    let tgttt = document.querySelector(".tgt_stat");
+    tgttt.innerHTML = "";
     for (let i = 0; i < dd.length; i++) {
         let template = document.createElement("p");
-        let opt=criteria[dd[i].ct];
+        let opt = criteria[dd[i].ct];
         switch (opt.type) {
             case "options":
                 template.innerText = opt.prompt + ":";
@@ -172,14 +174,14 @@ function updateFrontBoard() {
                     slc.appendChild(_opt);
                 }
                 slc.dataset.ttfield = dd[i].ct;
-                slc.value=basedata.target[dd[i].ct];
+                slc.value = basedata.target[dd[i].ct];
                 template.appendChild(slc);
                 break;
             case "number":
                 template.innerText = opt.prompt + ":";
                 let inpt = document.createElement("input");
                 inpt.type = "number";
-                inpt.value=basedata.target[dd[i].ct];
+                inpt.value = basedata.target[dd[i].ct];
                 inpt.dataset.ttfield = dd[i].ct;
                 template.appendChild(inpt);
                 break;
@@ -353,11 +355,13 @@ document.addEventListener("DOMContentLoaded", () => {
         updateFrontBoard();
     });
     let pti;
-    document.querySelector(".tgt_stat").addEventListener("input",(e)=>{
-        if (e.target.matches("[data-ttfield]")){
-            basedata.target[e.target.dataset.ttfield]=e.target.value;
-            try{clearTimeout(pti);}catch(e){};
-            pti=setTimeout(updateFrontBoard,300);
+    document.querySelector(".tgt_stat").addEventListener("input", (e) => {
+        if (e.target.matches("[data-ttfield]")) {
+            basedata.target[e.target.dataset.ttfield] = e.target.value;
+            try {
+                clearTimeout(pti);
+            } catch (e) {};
+            pti = setTimeout(updateFrontBoard, 300);
         }
     })
 })
