@@ -1,14 +1,25 @@
+var DEMO = false;
+
+var categories = {
+    //special satistics for categories here...
+    //may add formulae for calculation in the future.
+    Summary: {
+        hidden: true
+    }
+}
+
 var criteria = {
     floorspace: {
-        area: "Energy",
+        area: "Summary",
         type: "number",
+        displayPriority: 1,
         prompt: "Floor space (m^2)",
         weighting: function (floorspace) {
-            return 100-stat("euse")/floorspace*0.1;
+            return 100 - stat("euse") / floorspace * 0.1;
         }
     },
     occrate: {
-        area: "Energy",
+        area: "Summary",
         type: "number",
         prompt: "Hours building is occupied per week",
         weighting: -0.7775,
@@ -17,51 +28,210 @@ var criteria = {
     ncomp: {
         area: "Energy",
         type: "number",
-        prompt: "No. computers constantly on",
+        prompt: "No. computers turned on",
         weighting: -0.4
     },
     euse: {
         area: "Energy",
         type: "number",
-        prompt: "Yearly energy use (kWh):",
+        prompt: "12 Month Energy use (kWh)",
+        weighting: function (euse) {
+            return 100 - euse / stat('floorspace');
+        }
+    },
+    gpower: {
+        area: "Energy",
+        type: "number",
+        prompt: "Greenpower electricity percentage",
+        description: "The GreenPower Program (the Program) is a government managed scheme that enables Australian households and businesses to displace their electricity usage with certified renewable energy, which is added to the grid on their behalf.  ",
+        weighting: 5
+    },
+    ngas: {
+        area: "Energy",
+        type: "number",
+        prompt: "Yearly Natural gas use (MJ):",
         weighting: -0.1
-    }
+    },
+    dsll: {
+        area: "Energy",
+        type: "number",
+        prompt: "Yearly Diesel use (L):",
+        weighting: -0.1
+    },
+    wuse: {
+        area: "Water",
+        type: "number",
+        prompt: "Yearly Water Usage(L):",
+        weighting: -0.1
+    },
+    xrwtr: {
+        area: "Water",
+        type: "number",
+        prompt: "Percentage of externally recycled water:",
+        weighting: -0.1
+    },
+    gwaste: {
+        area: "Waste",
+        type: "number",
+        prompt: "Yearly general waste (kg):",
+        weighting: -0.1
+    },
+    mrecyc: {
+        area: "Waste",
+        type: "number",
+        prompt: "Yearly Mixed Recycling (kg):",
+        weighting: -0.1
+    },
+    airqual: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Particulate matter (ug/m^3):",
+        description: "This measures airborne particles less than 10 micrometres in diameter, which can be generated from a range of sources, such as mould, traffic and printers.",
+        weighting: -0.1
+    },
+    venteff: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Ventilation effectiveness (%):",
+        description: "This measures the amount of fresh air entering a building. We use the difference in CO2 levels between inside and outside the building to determine ventilation effectiveness, as per ASHRAE 62.1. CO2 levels outside are typically around 410 ppm. Enter the percentage of samples for which CO2 levels inside the building are no more than 810 ppm.",
+        weighting: -0.1
+    },
+    vocc: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Total Volatile Organic compounds (ppm):",
+        description: "Volatile organic compounds are released as a result of tenant activities and the materials selected for fit out, such as paint and carpet.",
+        weighting: -0.1
+    },
+    formaldh: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Formaldehyde (ppm):",
+        description: "Formaldehyde is associated with the office fit out. It is emitted from flooring, furnishings and adhesives.",
+        weighting: -0.1
+    },
+    illux: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Horizontal illuminance (%):",
+        description: "The data for lighting is based on spot measurements taken throughout the building over the course of one day. Enter the percentage of samples for which horizontal light is 320 lux or greater.",
+        weighting: -0.1
+    },
+    xcous: {
+        area: "Indoor Environment",
+        type: "number",
+        prompt: "Acoustic comfort (%):",
+        description: "The data for acoustic comfort is based on spot measurements taken throughout the building over the course of one day.Enter the percentage of readings that fall between 40-45 dB.",
+        weighting: -0.1
+    },
 }
 
 var cpm;
-function stat(st){
-    return (cpm[st])|| 0;
+
+function stat(st) {
+    return (cpm[st]) || 0;
+}
+
+function updateFrontBoard() {
+    // go through all statistics in final projec; figure out which ones are worth displaying
+    let ld = basedata.components[basedata.components.length - 1].data;
+    let dd = [];
+    for (let i in ld) {
+        try {
+            dd.push({
+                ct: i,
+                prio: criteria[i].displayPriority || 0
+            });
+        } catch (e) {
+            console.log("invalid criteria: " + i);
+        }
+    }
+    dd.sort((a, b) => {
+        return a.prio - b.prio
+    });
+    dd = dd.slice(0, 5);
+    let ihtml = ``;
+    for (let i = 0; i < dd.length; i++) {
+        let rcol=Math.abs((basedata.target[dd[i].ct]-ld[dd[i].ct])/basedata.target[dd[i].ct]);
+        if (rcol>1)rcol=1;
+        rcol=1-rcol;
+        let h = rcol * 120;
+        ihtml += `<p style="background: hsl(${h},100%,50%)">${criteria[dd[i].ct].prompt}: ${ld[dd[i].ct]}</p>`;
+    }
+    document.querySelector(".cnt_stat").innerHTML = ihtml;
+    let tgttt=document.querySelector(".tgt_stat");
+    tgttt.innerHTML="";
+    for (let i = 0; i < dd.length; i++) {
+        let template = document.createElement("p");
+        let opt=criteria[dd[i].ct];
+        switch (opt.type) {
+            case "options":
+                template.innerText = opt.prompt + ":";
+                let slc = document.createElement("select");
+                for (let xi in opt.scores) {
+                    let _opt = document.createElement("option");
+                    _opt.innerText = xi;
+                    slc.appendChild(_opt);
+                }
+                slc.dataset.ttfield = dd[i].ct;
+                slc.value=basedata.target[dd[i].ct];
+                template.appendChild(slc);
+                break;
+            case "number":
+                template.innerText = opt.prompt + ":";
+                let inpt = document.createElement("input");
+                inpt.type = "number";
+                inpt.value=basedata.target[dd[i].ct];
+                inpt.dataset.ttfield = dd[i].ct;
+                template.appendChild(inpt);
+                break;
+        }
+        if (opt.description) {
+            let dp = document.createElement("span");
+            dp.innerText = "(?)";
+            dp.classList.add("descriptionquery");
+            template.appendChild(dp);
+            //description div itself
+            let dcdv = document.createElement("div");
+            dcdv.innerHTML = opt.description;
+            dp.appendChild(dcdv);
+        }
+        tgttt.appendChild(template);
+    }
 }
 
 function generateHTML() {
+    //update current stats, target stats, project component detail
+
+
     //Generate based on the options defined in this file.
     for (let i in criteria) {
         let opt = criteria[i];
-        let div = document.querySelector(`.sustArea[data-divshow="${opt.area}"]`);
+        let div = document.querySelector(`.sustArea[data-divshow="${(opt.area).replace(/ /ig,"_")}"]`);
         //if the div doesnt exist, create it
         if (!div) {
             div = document.createElement("div");
             div.classList.add("sustArea");
-            div.dataset.divshow = opt.area;
+            div.dataset.divshow = (opt.area).replace(/ /ig, "_");
             div.innerHTML =
                 `<h3>${opt.area} Sustainability</h3>
-            <div class="sustainability_areas_add">
+            <div class='sustainability_subareas_add'>
             <h3>Add criteria:</h3>
             
-            <select data-divshow="${opt.area}Criteria">
+            <select data-divshow="${(opt.area).replace(/ /ig,"_")}criteria">
             </select>
-            <button data-divshow="${opt.area}Criteria">Add</button>
+            <button data-divshow="${(opt.area).replace(/ /ig,"_")}criteria">Add</button>
             </div>`;
-            document.querySelector(".maingroup[data-tabname='detailtab']").insertBefore(div, document.querySelector(".sustainability_areas_add"));
+            document.querySelector(".maingroup").insertBefore(div, document.querySelector(".sustainability_areas_add"));
             let xarea = document.querySelector("select[data-divshow='sustArea']");
             let nop = document.createElement("option");
-            nop.value = opt.area;
+            nop.value = (opt.area).replace(/ /ig, "_");
             nop.innerText = opt.area;
             xarea.appendChild(nop);
         }
         let cdiv = document.createElement("div");
         cdiv.classList.add("criteria");
-        cdiv.classList.add(opt.area + "criteria");
+        cdiv.classList.add((opt.area + "criteria").replace(/ /ig, "_"));
         cdiv.dataset.divshow = i;
         let template = document.createElement("p");
         switch (opt.type) {
@@ -77,7 +247,7 @@ function generateHTML() {
                 template.appendChild(slc);
                 break;
             case "number":
-                template.innerText = opt.prompt;
+                template.innerText = opt.prompt + ":";
                 let inpt = document.createElement("input");
                 inpt.type = "number";
                 inpt.dataset.field = i;
@@ -94,11 +264,10 @@ function generateHTML() {
             dcdv.innerHTML = opt.description;
             dp.appendChild(dcdv);
         }
-
         cdiv.appendChild(template);
-        div.insertBefore(cdiv, div.querySelector(".sustainability_areas_add"));
-
-        let sl = document.querySelector(`.sustArea[data-divshow="${opt.area}"]>div>select`);
+        div.insertBefore(cdiv, div.querySelector(".sustainability_subareas_add"));
+        //Add the corresponding option.
+        let sl = document.querySelector(`.sustArea[data-divshow="${(opt.area).replace(/ /ig,"_")}"]>div>select`);
         let ctop = document.createElement("option");
         ctop.value = i;
         ctop.innerText = opt.prompt;
@@ -119,16 +288,18 @@ function criteriamap(ct, dt) {
 
     }
     let w = criterium.weighting;
-    if (typeof w =="function")return w(val);
-    else return val*w;
+    if (typeof w == "function") return w(val);
+    else return val * w;
 }
+
+
 
 function calculateWeightings() {
     //fired on load and on switching to dashboard
     for (let component = 0; component < basedata.components.length - 1; component++) {
         let cmpnt = basedata.components[component];
         cmpnt.calculated = {};
-        cpm=cmpnt.data;
+        cpm = cmpnt.data;
         for (let dt in cmpnt.data) {
             try {
                 if (!cmpnt.calculated[criteria[dt].area]) cmpnt.calculated[criteria[dt].area] = 0;
@@ -138,85 +309,57 @@ function calculateWeightings() {
             }
         }
     }
-    //For the final component, sum all the other component weights. 
-    //[of only ACTIVATED components; then consider the theoretical maximum as well seperately.]
+    //For the final component, sum all the other component weights.
     let finalcmpnt = basedata.components[basedata.components.length - 1];
+    //Check all component areas and set zero for all of them to start.
     finalcmpnt.calculated = {};
+    finalcmpnt.data = {};
+    for (let i in criteria) {
+        finalcmpnt.calculated[criteria[i].area] = 0;
+    }
+
+    //[of only ACTIVATED components; then consider the theoretical maximum as well seperately.]
     for (let component = 0; component < basedata.components.length - 1; component++) {
         let cmpnt = basedata.components[component];
-        if (cmpnt.active || component==0)//baseline
+        if (cmpnt.active || component == 0) { //baseline
             for (let dt in cmpnt.calculated) {
                 if (!finalcmpnt.calculated[dt]) finalcmpnt.calculated[dt] = 0;
-                finalcmpnt.calculated[dt] += cmpnt.calculated[dt];
+                finalcmpnt.calculated[dt] += Number(cmpnt.calculated[dt]);
             }
+            for (let dt in cmpnt.data) {
+                //add all the individual data points to get the final project data.
+                if (!finalcmpnt.data[dt]) finalcmpnt.data[dt] = 0;
+                finalcmpnt.data[dt] += Number(cmpnt.data[dt]);
+            }
+        }
+    }
+    // Demo mode: random numbers
+    if (DEMO) {
+        for (let i in criteria) {
+            finalcmpnt.calculated[criteria[i].area] = Math.random() * 100;
+        }
     }
 }
 
-function renderDashboard() {
-    //update calculations
-    calculateWeightings();
-    //change the main displays
-    let finalcmpnt = basedata.components[basedata.components.length - 1];
-    let finalscore = 0;
-    if (!finalcmpnt.calculated || !Object.keys(finalcmpnt.calculated).length) {
-        document.querySelector("[data-metafield='Score']").innerText = "-- ";
-        document.querySelector(".gstar").style.width = 0 + "px";
-    } else {
-        for (let i in finalcmpnt.calculated) {
-            finalscore += finalcmpnt.calculated[i];
-        }
-        document.querySelector("[data-metafield='Score']").innerText = Math.round(finalscore);
-        //green star rating
-        if (finalscore > 100) finalscore = 100;
-        document.querySelector(".gstar").style.width = finalscore + "px";
-    }
-    //update the dashboard
-    let db = document.querySelector(".dashboardCategories");
-    db.innerHTML = "";
-    let index = basedata.selectedComponent;
-    for (let i = 0; i < basedata.components.length; i++) {
-        if (basedata.components[i].id == index) {
-            index = i;
-            break;
-        }
-    }
-    let ccpnt = basedata.components[index];
-    if (!ccpnt.calculated || !Object.keys(ccpnt.calculated).length) {
-        let db = document.querySelector(".dashboardCategories");
-        db.innerHTML = "<h1> Click on the 'Details' tab to start entering project details.</h1>";
-    } else {
-        for (let i in ccpnt.calculated) {
-            let d = document.createElement("div");
-            d.innerHTML = `
-            <h1>${i} Sustainability</h1>
-            <p>Score: ${ccpnt.calculated[i]}/100</p>
-        `;
-            if (index == basedata.components.length - 1) {
-                let cgreen = ccpnt.calculated[i];
-                if (cgreen > 120) cgreen = 120;
-                if (cgreen < 0) cgreen = 0;
-                d.style.background = `hsla(${cgreen},100%,50%,0.5)`
-            } else {
-                let clite = ccpnt.calculated[i];
-                let cred = (ccpnt.calculated[i] > 0) ? 120 : 0;
-                if (clite < 0) clite = -clite * 3;
-                if (clite > 100) clite = 100;
-                d.style.background = `hsla(${cred},${clite}%,50%,0.5)`
-            }
-            db.appendChild(d);
-        }
-    }
-}
 document.addEventListener("DOMContentLoaded", () => {
-    renderDashboard();
-    document.addEventListener("click", () => {
+    document.querySelector(".tabbar").addEventListener("click", () => {
         saveOnNavigate();
         calculateWeightings();
-        renderDashboard();
+        renderOverview();
+        updateFrontBoard();
     });
-    document.addEventListener("input", () => {
+    document.querySelector(".maingroup").addEventListener("input", () => {
         saveOnNavigate();
         calculateWeightings();
-        renderDashboard();
+        renderOverview();
+        updateFrontBoard();
     });
+    let pti;
+    document.querySelector(".tgt_stat").addEventListener("input",(e)=>{
+        if (e.target.matches("[data-ttfield]")){
+            basedata.target[e.target.dataset.ttfield]=e.target.value;
+            try{clearTimeout(pti);}catch(e){};
+            pti=setTimeout(updateFrontBoard,300);
+        }
+    })
 })

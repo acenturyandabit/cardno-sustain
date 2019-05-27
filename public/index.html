@@ -5,11 +5,14 @@
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-storage.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Fira+Sans&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" type="image/png" href="/logo.png"/>
     <script src="serve.js">
     </script>
     <script src="criteria.js">
     </script>
     <script src="export.js">
+    </script>
+    <script src="extern.js">
     </script>
     <script src="present.js">
     </script>
@@ -76,38 +79,47 @@
             </div>
         </div>
     </div>
-
-
-
-
-
     <div class="loading">
         <h1>Loading your project...</h1>
     </div>
     <div class="main_body_div" style="display:none">
         <h1>Cardno Sustain: <span data-metafield="Name" contenteditable="true">Project Name...</span></h1>
-        <h2>Project type: <span data-metafield="Type" contenteditable="true">Infrastructure</span> -- Timeframe:
-            <span data-metafield="startDate" contenteditable="true">Start date</span>-><span contenteditable="true"
-                data-metafield="endDate">End date</span></h2>
-        <p>Change image:<input class="bgim" type="file"><span style="display:none" class="ulcp">Upload
-                complete!</span>
-            -- <button class="xport">Export as file</button> -- <label>Input from file:<input class="impt"
-                    type="file"></label></p>
-        <h1>Current sustainabilty score: <span data-metafield="Score">50</span>/100</h1>
-        <p>Estimated Green Star rating:<img class="gstar" src="sixstar.png" style="height: 1em;width: 20px;
-            object-fit: cover;
-            object-position: left;"></p>
         <div class="unprint_body">
             <div class="tabbar">
-                <h1 data-group="hypergroup" data-tabname="overview" class="selected">Overview</h1>
-                <h1 data-group="hypergroup" data-tabname="components">Project Components</h1>
-                <h1 data-group="hypergroup" data-tabname="xreporting">External Reporting</h1>
+                <h2 data-group="hypergroup" data-tabname="overview" class="selected">Overview</h2>
+                <h2 data-group="hypergroup" data-tabname="components">Project Components</h2>
+                <h2 data-group="hypergroup" data-tabname="xreporting">External Reporting</h2>
+                <h2 data-group="hypergroup" data-tabname="config">Configure &#x1f527;</h2>
             </div>
             <div class="hypergroup" data-tabname="overview" style="display:block; padding: 0">
-                <canvas class="ringer" style="min-height:500px"></canvas>
+                <div style="display:flex;flex-direction:row;">
+                    <div style="flex: 1 0 50%">
+                        <h1>Project Sustainability Summary</h1>
+                        <div class="sratebox">
+
+                        </div>
+                        <div class="catbox">
+
+                        </div>
+                    </div>
+                    <div style="flex: 1 0 50%" class="ringer_parent">
+                        <canvas class="ringer"></canvas>
+                    </div>
+                </div>
             </div>
             <div class="hypergroup" data-tabname="components">
                 <div>
+                    <div class="uppersum" style="display: flex; flex-direction:row">
+                        <div style="flex: 1 0 50%;">
+                            <h3>Current statistics</h3>
+                            <div style="max-height:30%; overflow-y: auto" class="cnt_stat"></div>
+                        </div>
+                        <div style="flex: 1 0 50%;">
+                            <h3>Target statistics</h3>
+                            <div style="max-height:30%; overflow-y: auto" class="tgt_stat"></div>
+                        </div>
+                    </div>
+
                     <div class="projectComponents">
                         <p data-component='baseline' class="selected" data-special='baseline'>
                             <span>Baseline</span></span>
@@ -116,19 +128,7 @@
                         <p data-component='fresult' data-special='final'><span>Final result</span></p>
                     </div>
                 </div>
-                <div class="tabbar">
-                    <p data-group="maingroup" data-tabname="dashtab" class="selected">Dashboard</p>
-                    <p data-group="maingroup" data-tabname="detailtab">Details</p>
-                </div>
-                <div class="maingroup" data-tabname="dashtab" style="display:block; padding: 0">
-                    <div class="dashboardCategories">
-                        <div data-category="Ecological">
-                            <h1>Ecological sustainability</h1>
-                            <p>Score: <span class="Ecoscore"></span></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="maingroup" data-tabname="detailtab">
+                <div class="maingroup">
                     <div class="sustainability_areas_add">
                         <h3>Add a sustainability area:</h3>
                         <select data-divshow="sustArea">
@@ -138,34 +138,21 @@
                 </div>
             </div>
             <div class="hypergroup" data-tabname="xreporting">
-                <div class="tabbar">
-                    <p data-group="reportgroup" data-tabname="gstar" class="selected">GreenStar</p>
-                    <p data-group="reportgroup" data-tabname="nabers">NABERS</p>
-                    <p data-group="reportgroup" data-tabname="bess">BESS</p>
+                <div class="tabbar reports">
+                    <p data-group="reportgroup" data-tabname="new" unmanaged>New...</p>
                 </div>
-                <div class="reportgroup" data-tabname="gstar" style="display:block; padding: 0">
-                    <h2>Upload report...</h2>
-                    <input type="file">
-                    <button>Go</button>
-                    <div>
-                    </div>
-                </div>
-                <div class="reportgroup" data-tabname="nabers">
-                    <h2>Upload report...</h2>
-                    <input type="file">
-                    <button>Go</button>
-                    <div>
-
-                    </div>
-                </div>
-                <div class="reportgroup" data-tabname="bess">
-                    <h2>Upload report...</h2>
-                    <input type="file">
-                    <button>Go</button>
-                    <div>
-
-                    </div>
-                </div>
+            </div>
+            <div class="hypergroup" data-tabname="config">
+                <h2>Project type: <span data-metafield="Type" contenteditable="true">Infrastructure</span> </h2>
+                <h2>Project Location: <span data-metafield="location" contenteditable="true">Australia</span> </h2>
+                <h2>Timeframe:<span data-metafield="startDate" contenteditable="true">Start date</span>-><span
+                        contenteditable="true" data-metafield="endDate">End date</span></h2>
+                <h2>Image</h2>
+                <p>Change image:<input class="bgim" type="file"><span style="display:none" class="ulcp">Upload
+                        complete!</span></p>
+                <h2>Import / export details</h2>
+                <p><button class="xport">Export as file</button></p>
+                <p><label>Input from file:<input class="impt" type="file"></label></p>
             </div>
         </div>
     </div>

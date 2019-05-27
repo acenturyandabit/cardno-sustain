@@ -2,6 +2,13 @@
 - disable details for final result
 - Offline error handling
 
+
+
+final unupdatable
+
+
+
+
 upload PDF results ===> Display "Extracting information..." ===> Display "Done!" ===> Display reported stats ===> fill in criteria in baseline
 
 dashboard ===> show circle
@@ -9,3 +16,4 @@ dashboard ===> show circle
 EXTRA TIME
 
 Display relevant stats in each reporting section.
+

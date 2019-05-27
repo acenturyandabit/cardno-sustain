@@ -1,5 +1,5 @@
 var circleSettings = {
-    sectors: [""],
+    sectors: ["Energy", "Water", "Waste", "Indoor Environment"],
     r0: 10,
     r1: 400,
     w: 500,
@@ -12,9 +12,9 @@ function renderCircle(data) {
         data = {};
         for (let i = 0; i < circleSettings.sectors.length; i++) {
             try {
-                data[i] = basedata.components(basedata.components.length - 1).calculated[i] || 0;
+                data[circleSettings.sectors[i]] = basedata.components[basedata.components.length - 1].calculated[circleSettings.sectors[i]] || 0;
             } catch (e) {
-                data[i] = 0;
+                data[circleSettings.sectors[i]] = 0;
             }
         }
     }
@@ -38,6 +38,7 @@ function renderCircle(data) {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, c.width, c.height);
     for (let i = 0; i < data.length; i++) {
+        if (data[i].v<0) data[i].v=0;
         ctx.beginPath();
         let angleStart = i * 2 * Math.PI / nsectors;
         let angleEnd = (i + 1) * 2 * Math.PI / nsectors;
@@ -57,7 +58,7 @@ function renderCircle(data) {
         ctx.fillStyle = "black";
     }
     ctx.font = `${Math.floor(md/10)}px sans-serif`;
-    ctx.textAlign="center";
+    ctx.textAlign = "center";
     for (let i = 0; i < data.length; i++) {
         let angleStart = i * 2 * Math.PI / nsectors;
         let angleEnd = (i + 1) * 2 * Math.PI / nsectors;
@@ -72,7 +73,7 @@ function renderCircle(data) {
     //draw the rings
     for (let i = 0; i < 11; i++) {
         ctx.beginPath();
-        let sr = i* (circleSettings.r1 - circleSettings.r0)/10 + circleSettings.r0;
+        let sr = i * (circleSettings.r1 - circleSettings.r0) / 10 + circleSettings.r0;
         ctx.moveTo(circleSettings.w / 2 + sr, circleSettings.h / 2);
         ctx.arc(circleSettings.w / 2, circleSettings.h / 2, sr, 0, 2 * Math.PI);
         ctx.stroke();
@@ -82,7 +83,84 @@ function renderCircle(data) {
 
 }
 
+function renderOverview() {
+    //update calculations
+
+
+
+    //Render star scores, if applicable
+    // Add Star rating things.
+    let sratebox = document.querySelector(".sratebox");
+    let ihtml = ``;
+    for (let i in basedata.ratings) {
+        ihtml += `
+        <h2>${ (basedata.ratings[i].isEstimated)?"Estimated ": ""} ${basedata.ratings[i].properName} rating: 
+        <img src="sixstar.png" style="height: 21px; width: ${Math.floor(basedata.ratings[i].value/5*100)}px; object-fit:cover;
+        object-position: left;"> <span>${basedata.ratings[i].value}</span></h2>`;
+    }
+    sratebox.innerHTML = ihtml;
+
+    //update the dashboard
+    let db = document.querySelector(".catbox");
+    db.innerHTML = "";
+    let index = basedata.components.length - 1;
+    let ccpnt = basedata.components[index];
+    if (!ccpnt.calculated || !Object.keys(ccpnt.calculated).length) {
+        let db = document.querySelector(".catbox");
+        db.innerHTML = "<h2> Click on the 'Project components' tab to start entering project details.</h2>";
+    } else {
+        for (let i in ccpnt.calculated) {
+            if (categories[i]){
+                if (categories[i].hidden)continue;
+            }
+            let d = document.createElement("div");
+            let ihtml = `
+                <h1>${i} Sustainability</h1>
+                <p>Score: ${Math.round(ccpnt.calculated[i])}/100</p>
+            `;
+            let dd = [];
+            for (let dtp in ccpnt.data) {
+                try {
+                    if (criteria[dtp].area == i) {
+
+                        dd.push({
+                            ct: dtp,
+                            prio: criteria[dtp].displayPriority || 0
+                        });
+                    }
+                } catch (e) {
+                    console.log("invalid criteria: " + dtp);
+                }
+            }
+            dd.sort((a, b) => {
+                return a.prio - b.prio
+            });
+            dd = dd.slice(0, 5);
+            for (let jj = 0; jj < dd.length; jj++) {
+                ihtml += `<p>${criteria[dd[jj].ct].prompt}: ${ccpnt.data[dd[jj].ct]}</p>`;
+            }
+            d.innerHTML = ihtml;
+            if (index == basedata.components.length - 1) {
+                let cgreen = ccpnt.calculated[i];
+                if (cgreen > 120) cgreen = 120;
+                if (cgreen < 0) cgreen = 0;
+                d.style.background = `hsla(${cgreen},100%,50%,0.5)`
+            } else {
+                let clite = ccpnt.calculated[i];
+                let cred = (ccpnt.calculated[i] > 0) ? 120 : 0;
+                if (clite < 0) clite = -clite * 3;
+                if (clite > 100) clite = 100;
+                d.style.background = `hsla(${cred},${clite}%,50%,0.5)`
+            }
+            db.appendChild(d);
+        }
+    }
+
+    setTimeout(renderCircle);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector(".tabbar>[data-group='hypergroup']").addEventListener("click", renderCircle);
-    renderCircle();
+    calculateWeightings();
+    document.querySelector(".tabbar>[data-group='hypergroup']").addEventListener("click", renderOverview);
+    setTimeout(renderOverview);
 })

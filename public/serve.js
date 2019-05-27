@@ -78,6 +78,14 @@ function guid(count = 6) {
 
 var basedata = {
     selectedComponent: "baseline",
+    ratings:{
+        greenstar:{
+            isEstimated:true,
+            value:0,
+            properName:"Green star"
+        }
+    },
+    target:{},
     components: [{
             id: "baseline",
             displayName: "Baseline",
@@ -121,7 +129,8 @@ function loadNow(data) {
     //load selected component
     renderComponent(basedata.selectedComponent);
     calculateWeightings();
-    renderDashboard();
+    renderOverview();
+    loadReports();
     if (basedata.image)document.body.style.backgroundImage=`url(${basedata.image})`;
 }
 
@@ -194,10 +203,9 @@ document.addEventListener("DOMContentLoaded", () => {
             db.collection("cardno").doc(usp.get('docName')).get().then((d) => {
                 document.body.querySelector(".loading").style.display = "none";
                 let xd = d.data();
-                if (!xd) {
-                    xd = basedata;
-                }
-                loadNow(xd);
+                Object.assign(basedata,xd);
+                if (!d.exists)db.collection("cardno").doc(usp.get("docName")).set(basedata);
+                loadNow(basedata);
                 document.body.querySelector(".main_body_div").style.display = "block";
             })
         } else {
@@ -217,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         //tabbar
         document.body.addEventListener("click", (e) => {
-            if (e.target.matches(".tabbar>*")) {
+            if (e.target.matches(".tabbar>*") && !e.target.matches("[unmanaged]")) {
                 //hide all other tabs
                 let tbs =e.target.parentElement.querySelectorAll(`[data-tabname]`);
                 for (let i = 0; i < tbs.length; i++) {
