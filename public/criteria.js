@@ -14,15 +14,13 @@ var criteria = {
         type: "number",
         displayPriority: 1,
         prompt: "Floor space (m^2)",
-        weighting: function (floorspace) {
-            return 100 - stat("euse") / floorspace * 0.1;
-        }
+        weighting:0
     },
     occrate: {
         area: "Summary",
         type: "number",
         prompt: "Hours building is occupied per week",
-        weighting: -0.7775,
+        weighting: 0,
         description: "An occupied building is over 20% full."
     },
     ncomp: {
@@ -36,7 +34,7 @@ var criteria = {
         type: "number",
         prompt: "12 Month Energy use (kWh)",
         weighting: function (euse) {
-            return 100 - euse / stat('floorspace');
+            return 100 - euse / (stat('floorspace')*stat('occrate'));
         }
     },
     gpower: {
@@ -50,7 +48,7 @@ var criteria = {
         area: "Energy",
         type: "number",
         prompt: "Yearly Natural gas use (MJ):",
-        weighting: -0.1
+        weighting: 100 - euse / (stat('floorspace')*stat('occrate'));
     },
     dsll: {
         area: "Energy",
@@ -62,13 +60,13 @@ var criteria = {
         area: "Water",
         type: "number",
         prompt: "Yearly Water Usage(L):",
-        weighting: -0.1
+        weighting: -0.01
     },
     xrwtr: {
         area: "Water",
         type: "number",
         prompt: "Percentage of externally recycled water:",
-        weighting: -0.1
+        weighting: 1
     },
     gwaste: {
         area: "Waste",
@@ -80,7 +78,7 @@ var criteria = {
         area: "Waste",
         type: "number",
         prompt: "Yearly Mixed Recycling (kg):",
-        weighting: -0.1
+        weighting: 0.1
     },
     airqual: {
         area: "Indoor Environment",
@@ -94,7 +92,7 @@ var criteria = {
         type: "number",
         prompt: "Ventilation effectiveness (%):",
         description: "This measures the amount of fresh air entering a building. We use the difference in CO2 levels between inside and outside the building to determine ventilation effectiveness, as per ASHRAE 62.1. CO2 levels outside are typically around 410 ppm. Enter the percentage of samples for which CO2 levels inside the building are no more than 810 ppm.",
-        weighting: -0.1
+        weighting: 0.1
     },
     vocc: {
         area: "Indoor Environment",
@@ -115,7 +113,7 @@ var criteria = {
         type: "number",
         prompt: "Horizontal illuminance (%):",
         description: "The data for lighting is based on spot measurements taken throughout the building over the course of one day. Enter the percentage of samples for which horizontal light is 320 lux or greater.",
-        weighting: -0.1
+        weighting: 0.1
     },
     xcous: {
         area: "Indoor Environment",
