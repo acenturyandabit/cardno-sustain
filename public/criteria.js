@@ -1,4 +1,4 @@
-var DEMO = false;
+var DEMO = true;
 
 var categories = {
     //special satistics for categories here...
@@ -47,7 +47,7 @@ var criteria = {
     ngas: {
         area: "Energy",
         type: "number",
-        prompt: "Yearly Natural gas use (MJ):",
+        prompt: "Yearly Natural gas use (MJ)",
         weighting: () => {
             return 100 - euse / (stat('floorspace') * stat('occrate'));
         }
@@ -55,72 +55,72 @@ var criteria = {
     dsll: {
         area: "Energy",
         type: "number",
-        prompt: "Yearly Diesel use (L):",
+        prompt: "Yearly Diesel use (L)",
         weighting: -0.1
     },
     wuse: {
         area: "Water",
         type: "number",
-        prompt: "Yearly Water Usage(L):",
+        prompt: "Yearly Water Usage(L)",
         weighting: -0.01
     },
     xrwtr: {
         area: "Water",
         type: "number",
-        prompt: "Percentage of externally recycled water:",
+        prompt: "Percentage of externally recycled water",
         weighting: 1
     },
     gwaste: {
         area: "Waste",
         type: "number",
-        prompt: "Yearly general waste (kg):",
+        prompt: "Yearly general waste (kg)",
         weighting: -0.1
     },
     mrecyc: {
         area: "Waste",
         type: "number",
-        prompt: "Yearly Mixed Recycling (kg):",
+        prompt: "Yearly Mixed Recycling (kg)",
         weighting: 0.1
     },
     airqual: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Particulate matter (ug/m^3):",
+        prompt: "Particulate matter (ug/m^3)",
         description: "This measures airborne particles less than 10 micrometres in diameter, which can be generated from a range of sources, such as mould, traffic and printers.",
         weighting: -0.1
     },
     venteff: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Ventilation effectiveness (%):",
+        prompt: "Ventilation effectiveness (%)",
         description: "This measures the amount of fresh air entering a building. We use the difference in CO2 levels between inside and outside the building to determine ventilation effectiveness, as per ASHRAE 62.1. CO2 levels outside are typically around 410 ppm. Enter the percentage of samples for which CO2 levels inside the building are no more than 810 ppm.",
         weighting: 0.1
     },
     vocc: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Total Volatile Organic compounds (ppm):",
+        prompt: "Total Volatile Organic compounds (ppm)",
         description: "Volatile organic compounds are released as a result of tenant activities and the materials selected for fit out, such as paint and carpet.",
         weighting: -0.1
     },
     formaldh: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Formaldehyde (ppm):",
+        prompt: "Formaldehyde (ppm)",
         description: "Formaldehyde is associated with the office fit out. It is emitted from flooring, furnishings and adhesives.",
         weighting: -0.1
     },
     illux: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Horizontal illuminance (%):",
+        prompt: "Horizontal illuminance (%)",
         description: "The data for lighting is based on spot measurements taken throughout the building over the course of one day. Enter the percentage of samples for which horizontal light is 320 lux or greater.",
         weighting: 0.1
     },
     xcous: {
         area: "Indoor Environment",
         type: "number",
-        prompt: "Acoustic comfort (%):",
+        prompt: "Acoustic comfort (%)",
         description: "The data for acoustic comfort is based on spot measurements taken throughout the building over the course of one day.Enter the percentage of readings that fall between 40-45 dB.",
         weighting: -0.1
     },

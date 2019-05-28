@@ -250,3 +250,7 @@ div[data-slide] {
     height:3em;
     vertical-align: middle;
 }
+
+[data-slide='slide2'] em{
+    color: blue;
+}

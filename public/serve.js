@@ -164,6 +164,10 @@ function renderComponent(index) {
     for (let i in data) {
         showOption(i, data[i]);
     }
+    //also show description
+    if (basedata.components[index].description){
+        
+    }
 }
 
 function showOption(i, value) {
