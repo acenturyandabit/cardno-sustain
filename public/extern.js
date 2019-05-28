@@ -18,14 +18,21 @@ function addNewReportTab(rguid) {
     nd.classList.add("reportgroup");
     nd.dataset.tabname = rguid;
     nd.innerHTML = `
-        <!--<h2>Upload report...</h2>
+        <h2>Report</h2>    
+        <p>Rated value:<input type="number"></p>
+        <p>Has the value been certified? <input type="checkbox"></p>
+        <h2>Upload report</h2>
         <input type="file">
-        <button>Upload</button>
-        <p>No file uploaded yet.<a></a></p>-->
-        <p>Report value:<input type="number"></p>
-        <!--<p>Has the value been certified? <input type="checkbox"></p>-->
+        <p><a target="_blank">No file uploaded yet.</a></p>
+        
+        <!---->
         `;
     nd.querySelector("input[type='number']").value = basedata.ratings[rguid].value;
+    nd.querySelector("input[type='checkbox']").checked = !basedata.ratings[rguid].isEstimated;
+    if (basedata.ratings[rguid].fileurl) {
+        nd.querySelector("a").href = basedata.ratings[rguid].fileurl;
+        nd.querySelector("a").innerText = "Download File";
+    }
     nd.classList.add(".reportgroup");
     nd.dataset.tabname = rguid;
     document.querySelector(".hypergroup[data-tabname='xreporting']").appendChild(nd);
@@ -63,6 +70,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(".hypergroup[data-tabname='xreporting']").addEventListener("input", (e) => {
         if (e.target.matches("input[type='number']")) {
             basedata.ratings[e.target.parentElement.parentElement.dataset.tabname].value = e.target.value;
+        } else if (e.target.matches("input[type='file']")) {
+            // Create a reference to 'the image id'
+            let ff = e.target;
+            let tn = e.target.parentElement.dataset.tabname;
+            let name = "cardno_" + usp.get("docName") + "_report" + tn;
+            let cimref = storageRef.child(name);
+            cimref.put(ff.files[0]).then((ref) => {
+                cimref.getDownloadURL().then((url) => {
+                    basedata.ratings[tn].fileurl = url;
+                    db.collection("cardno").doc(usp.get("docName")).update(basedata);
+                    ff.parentElement.querySelector("a").innerText = "Download file";
+                    ff.parentElement.querySelector("a").href = url;
+                });
+            });
+
+        }else if (e.target.matches("input[type='checkbox']")) {
+            basedata.ratings[e.target.parentElement.parentElement.dataset.tabname].isEstimated = !e.target.checked;
         }
     });
     setTimeout(renderOverview);

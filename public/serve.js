@@ -56,9 +56,8 @@ function saveNow() {
             let cimref = storageRef.child(name);
             cimref.put(document.querySelector(".bgim").files[0]).then((ref) => {
                 cimref.getDownloadURL().then((url) => {
-                    db.collection("cardno").doc(usp.get("docName")).update({
-                        image: url
-                    });
+                    basedata.image=url;
+                    db.collection("cardno").doc(usp.get("docName")).update(basedata);
                     document.querySelector(".ulcp").style.display="inline-block";
                     setTimeout(()=>{document.querySelector(".ulcp").style.display="none";},2000);
                 });
