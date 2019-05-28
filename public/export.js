@@ -19,6 +19,8 @@ function download(data, filename, type) {
     }
 }
 window.addEventListener("beforeprint", () => {
+    //confirm image 
+    if (basedata.image)document.querySelector("img.print_body").src=basedata.image;
     //generate stuff
     let pb = document.querySelector("div.print_body");
     pb.innerHTML = ``;

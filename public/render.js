@@ -114,6 +114,7 @@ function renderOverview() {
                 if (categories[i].hidden)continue;
             }
             let d = document.createElement("div");
+            d.dataset.catcat=i;
             let ihtml = `
                 <h1>${i} Sustainability</h1>
                 <p>Score: ${Math.round(ccpnt.calculated[i])}/100</p>
@@ -159,8 +160,55 @@ function renderOverview() {
     setTimeout(renderCircle);
 }
 
+
+var modals={
+    "Energy":()=>{
+        return `<div>
+        <h1>Energy sustainability</h1>
+        <p>Compared to the GreenStar reference building, this building saves ${basedata.components[basedata.components.length-1].data.euse || 0}KwH per annum, amounting to $${Math.round((basedata.components[basedata.components.length-1].data.euse || 0)*0.07)} per year.</p>
+    </div>`
+    },
+    "Water":()=>{
+        return `<div>
+        <h1>Water sustainability</h1>
+        <p>Compared to the GreenStar reference building, this building saves ${basedata.components[basedata.components.length-1].data.wuse || 0}L per annum, amounting to $${Math.round((basedata.components[basedata.components.length-1].data.wuse || 0)*0.07)} per year.</p>
+    </div>`
+    },
+    "Waste":()=>{
+        return `<div>
+        <h1>Waste sustainability</h1>
+        <p>Compared to the GreenStar reference building, this building generate ${basedata.components[basedata.components.length-1].data.gwaste || 0}kg less landfill per annum.</p>
+    </div>`
+    },
+    "Indoor Environment":()=>{
+        return `<div>
+        <h1>Indoor Environment sustainability</h1>
+        <p>Compared to the GreenStar reference building, this building has ${basedata.components[basedata.components.length-1].data.airqual || 0}% better air quality.</p>
+    </div>`
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     calculateWeightings();
     document.querySelector(".tabbar>[data-group='hypergroup']").addEventListener("click", renderOverview);
     setTimeout(renderOverview);
+    document.querySelector(".catbox").addEventListener("click",(e)=>{
+        let et=e.target;
+        while (!et.matches(".catbox")){
+            if (et.matches(".catbox>div")){
+                //delete and regenerate interior content
+                document.querySelector(".modal").innerHTML=modals[et.dataset.catcat]();
+                //show appropriate interior content
+                document.querySelector(".modal").style.display="block";
+                break;
+            }
+            else{
+                et=et.parentElement;
+            }
+        }
+        
+    })
+    document.querySelector(".modal").addEventListener("click",(e)=>{
+        document.querySelector(".modal").style.display="none";
+    })
 })
